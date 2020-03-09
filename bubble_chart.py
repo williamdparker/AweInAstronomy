@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 #   Make fonts nicer
 #   Fix line segment length
 #   Determine actual conversion factor between points and plot range
+#   Figure out how to make transparent background
 
 filename = 'FactorsOfAwe.png'
 
