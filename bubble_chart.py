@@ -13,7 +13,7 @@ filename = 'FactorsOfAwe.png'
 center_text = 'Factors\nof\nAwe'
 factors_of_awe = ['Accommodation', 'Physical', 'Vastness', 'Connection', 'Self-Loss', 'Time']
 factors_of_awe_survey_result_means = [5.0, 3.6, 5.0, 4.1, 3.6, 4.1]
-factors_of_awe_survey_result_standard_deviations =[0.5, 0.5, 0.5, 0.5, 0.5, 0.3]
+factors_of_awe_survey_result_standard_deviations = [0.5, 0.5, 0.5, 0.5, 0.5, 0.3]
 factors_of_awe_strings = []
 
 for index in range(len(factors_of_awe)):

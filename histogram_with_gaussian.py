@@ -5,9 +5,11 @@ import matplotlib.pyplot as plt
 #   Make similar subplot for SENS data
 # Add Likert scale labels to x-axis
 
+filename = 'AweInAstronomyClass.png'
+
 
 nature_awe_responses = np.array([[]])
-class_awe_responses = np.array([[4.5, 5.3, 5.0, 4.6, 3.5, 3.5, 4.5, 3.5, 4.9, 4.5, 3.0, 3.0, 3.5],
+class_awe_responses = np.array([[4.5, 5.3, 5.0, 4.6, 3.5, 3.5, 4.5, 3.5, 4.9, 4.5, 3.0, 3.5],
                                 [1.7, 1.7, 1.1, 1.5, 1.4, 1.9, 0.8, 1.5, 1.8, 1.6, 1.3, 1.4]])
 
 bins = [1, 2, 3, 4, 5, 6, 7]
@@ -27,4 +29,5 @@ plt.axis([bins[0], bins[-1], 0, peak_value + 1])
 
 plt.hist(class_awe_responses[0], bins=bins)
 
-plt.show()
+plt.savefig(filename)
+# plt.show()
