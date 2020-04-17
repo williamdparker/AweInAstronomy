@@ -1,11 +1,17 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.patches as mpatches
 
 # Add data from SENS to nature_awe_responses
 #   Make similar subplot for SENS data
 # Add Likert scale labels to x-axis
 
+# Move arrows up and re-introduce labels
+
 filename = 'AweInAstronomyClass.png'
+
+plt.style.use('dark_background')
+figure, axes = plt.subplots()
 
 
 nature_awe_responses = np.array([[]])
@@ -25,9 +31,29 @@ normal_curve = peak_value * np.exp(-0.5 *
 
 plt.plot(normal_curve_input, normal_curve)
 
-plt.axis([bins[0], bins[-1], 0, peak_value + 1])
+# Label Likert scale
+#plt.text(2, -1.0, 'Disagree', ha='center')
+#plt.text(6, -1.0, 'Agree', ha='center')
 
+horizontal_range = bins[-1] - bins[0]
+print(horizontal_range)
+horizontal_midpoint = 0.5 * (bins[-1] + bins[0])
+print(horizontal_midpoint)
+arrow_length = 0.4 * horizontal_range
+left_arrow_start = 0.95 * horizontal_midpoint
+right_arrow_start = 1.05 * horizontal_midpoint
+arrow_vertical = -0.5
+
+# Add arrows
+left_arrow = mpatches.Arrow(left_arrow_start, arrow_vertical, -arrow_length, 0.,
+                            width=1.0, label='Disagree')
+axes.add_patch(left_arrow)
+right_arrow = mpatches.Arrow(right_arrow_start, arrow_vertical, arrow_length, 0,
+                             width=1.0, label='Agree')
+axes.add_patch(right_arrow)
+
+plt.axis([bins[0], bins[-1], -0.9, peak_value + 1])
 plt.hist(class_awe_responses[0], bins=bins)
 
-plt.savefig(filename)
-# plt.show()
+# plt.savefig(filename)
+plt.show()
