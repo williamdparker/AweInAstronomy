@@ -1,21 +1,19 @@
 import altair as alt
 from altair_saver import save
 import numpy as np
+from plasma_colors_for_bar import calculate_plasma_colors_for_bar
 
+alt.renderers.set_embed_options(theme='dark')
 alt.renderers.enable('png')
 
+number_of_likert_scale_points = 7
+
+# SENS ("Before class") Data
 nature_data = np.array([0, 2, 3, 5, 3, 2, 0])
 
-factors_of_awe_data = np.array([[1, 2, 3, 4, 5, 6, 7],
-                                [1, 2, 3, 4, 5, 6, 7],
-                                [1, 2, 3, 4, 5, 6, 7],
-                                [1, 2, 3, 4, 5, 6, 7],
-                                [1, 2, 3, 4, 5, 6, 7],
-                                [1, 2, 3, 4, 5, 6, 7]])
-
+# SENS Data Analysis
 number_of_respondents = np.sum(nature_data)
 percentage_of_respondents = 100 * nature_data / number_of_respondents
-factors_percentage_of_respondents = 100 * factors_of_awe_data / number_of_respondents
 
 p3half = 0.5 * percentage_of_respondents[3]
 
@@ -33,19 +31,51 @@ percentage_end = np.append(percentage_end,
                            p3half + percentage_of_respondents[4] + percentage_of_respondents[5]
                            + percentage_of_respondents[6])
 
+# AWE-S ("After class") Data
+# Rows = Time, Self loss, Connection, Vastness, Physical, Accomodation
+# Columns = # of {Strongly disagree, disagree, slightly disagree, neither agree nor disagree,
+#                 slightly agree, agree, strongly agree} respondents
+number_of_factors = 6
+factors_of_awe_data = np.array([[0, 0, 6, 3, 4, 1, 0],
+                                [0, 2, 3, 7, 2, 0, 0],
+                                [0, 0, 5, 4, 4, 1, 0],
+                                [0, 0, 2, 5, 3, 4, 0],
+                                [0, 4, 1, 6, 2, 1, 0],
+                                [0, 0, 1, 4, 4, 5, 0]])
+
+factors_percentage_of_respondents = 100 * factors_of_awe_data / number_of_respondents
 factors_p3half = 0.5 * factors_percentage_of_respondents[:, 3]
-factors_percentage_start = np.array([])
+
+factors_percentage_start = np.array([-factors_p3half - factors_percentage_of_respondents[:, 2]
+                                                     - factors_percentage_of_respondents[:, 1]
+                                                     - factors_percentage_of_respondents[:, 0],
+                                     -factors_p3half - factors_percentage_of_respondents[:, 2]
+                                                     - factors_percentage_of_respondents[:, 1],
+                                     -factors_p3half - factors_percentage_of_respondents[:, 2],
+                                     -factors_p3half,
+                                      factors_p3half,
+                                      factors_p3half + factors_percentage_of_respondents[:, 4],
+                                      factors_p3half + factors_percentage_of_respondents[:, 4]
+                                                     + factors_percentage_of_respondents[:, 5]])
+
+factors_percentage_end = factors_percentage_start[1:]
+last_column = np.reshape(factors_p3half +
+                         factors_percentage_of_respondents[:, 4] +
+                         factors_percentage_of_respondents[:, 5] +
+                         factors_percentage_of_respondents[:, 6], (number_of_factors, 1))
+
+factors_percentage_end = np.append(factors_percentage_end, last_column, axis=1)
 
 
 source = alt.pd.DataFrame([
-      {
+    {
         "question": "Pre-Class Awe",
         "type": "Strongly disagree",
         "value": nature_data[0],
         "percentage": percentage_of_respondents[0],
         "percentage_start": percentage_start[0],
         "percentage_end": percentage_end[0]
-      },
+    },
     {
         "question": "Pre-Class Awe",
         "type": "Disagree",
@@ -71,317 +101,369 @@ source = alt.pd.DataFrame([
         "percentage_end": percentage_end[3]
     },
     {
-         "question": "Pre-Class Awe",
-         "type": "Slightly agree",
-         "value": nature_data[4],
-         "percentage": percentage_of_respondents[4],
-         "percentage_start": percentage_start[4],
-         "percentage_end": percentage_end[4]
+        "question": "Pre-Class Awe",
+        "type": "Slightly agree",
+        "value": nature_data[4],
+        "percentage": percentage_of_respondents[4],
+        "percentage_start": percentage_start[4],
+        "percentage_end": percentage_end[4]
     },
     {
-         "question": "Pre-Class Awe",
-         "type": "Agree",
-         "value": nature_data[5],
-         "percentage": percentage_of_respondents[5],
-         "percentage_start": percentage_start[5],
-         "percentage_end": percentage_end[5]
+        "question": "Pre-Class Awe",
+        "type": "Agree",
+        "value": nature_data[5],
+        "percentage": percentage_of_respondents[5],
+        "percentage_start": percentage_start[5],
+        "percentage_end": percentage_end[5]
     },
-      {
+    {
         "question": "Pre-Class Awe",
         "type": "Strongly agree",
         "value": nature_data[6],
         "percentage": percentage_of_respondents[6],
         "percentage_start": percentage_start[6],
         "percentage_end": percentage_end[6]
-      }
+    },
+    {
+        "question": "Time",
+        "type": "Strongly disagree",
+        "value": factors_of_awe_data[0][0],
+        "percentage": factors_percentage_of_respondents[0][0],
+        "percentage_start": factors_percentage_start[0][0],
+        "percentage_end": factors_percentage_end[0][0]
+    },
+    {
+        "question": "Time",
+        "type": "Disagree",
+        "value": factors_of_awe_data[0][1],
+        "percentage": factors_percentage_of_respondents[0][1],
+        "percentage_start": factors_percentage_start[0][1],
+        "percentage_end": factors_percentage_end[0][1]
+    },
+    {
+        "question": "Time",
+        "type": "Slightly disagree",
+        "value": factors_of_awe_data[0][2],
+        "percentage": factors_percentage_of_respondents[0][2],
+        "percentage_start": factors_percentage_start[0][2],
+        "percentage_end": factors_percentage_end[0][2]
+    },
+    {
+        "question": "Time",
+        "type": "Neither agree nor disagree",
+        "value": factors_of_awe_data[0][3],
+        "percentage": factors_percentage_of_respondents[0][3],
+        "percentage_start": factors_percentage_start[0][3],
+        "percentage_end": factors_percentage_end[0][3]
+    },
+    {
+        "question": "Time",
+        "type": "Slightly agree",
+        "value": factors_of_awe_data[0][4],
+        "percentage": factors_percentage_of_respondents[0][4],
+        "percentage_start": factors_percentage_start[0][4],
+        "percentage_end": factors_percentage_end[0][4]
+    },
+    {
+        "question": "Time",
+        "type": "Agree",
+        "value": factors_of_awe_data[0][5],
+        "percentage": factors_percentage_of_respondents[0][5],
+        "percentage_start": factors_percentage_start[0][5],
+        "percentage_end": factors_percentage_end[0][5]
+    },
+    {
+        "question": "Time",
+        "type": "Strongly agree",
+        "value": factors_of_awe_data[0][6],
+        "percentage": factors_percentage_of_respondents[0][6],
+        "percentage_start": factors_percentage_start[0][6],
+        "percentage_end": factors_percentage_end[0][6]
+    },
+    {
+        "question": "Self loss",
+        "type": "Strongly disagree",
+        "value": factors_of_awe_data[0],
+        "percentage": factors_percentage_of_respondents[1][0],
+        "percentage_start": factors_percentage_start[1][0],
+        "percentage_end": factors_percentage_end[1][0]
+    },
+    {
+        "question": "Self loss",
+        "type": "Disagree",
+        "value": factors_of_awe_data[1][1],
+        "percentage": factors_percentage_of_respondents[1][1],
+        "percentage_start": factors_percentage_start[1][1],
+        "percentage_end": factors_percentage_end[1][1]
+    },
+    {
+        "question": "Self loss",
+        "type": "Slightly disagree",
+        "value": factors_of_awe_data[1][2],
+        "percentage": factors_percentage_of_respondents[1][2],
+        "percentage_start": factors_percentage_start[1][2],
+        "percentage_end": factors_percentage_end[1][2]
+    },
+    {
+        "question": "Self loss",
+        "type": "Neither agree nor disagree",
+        "value": factors_of_awe_data[1][3],
+        "percentage": factors_percentage_of_respondents[1][3],
+        "percentage_start": factors_percentage_start[1][3],
+        "percentage_end": factors_percentage_end[1][3]
+    },
+    {
+        "question": "Self loss",
+        "type": "Slightly agree",
+        "value": factors_of_awe_data[1][4],
+        "percentage": factors_percentage_of_respondents[1][4],
+        "percentage_start": factors_percentage_start[1][4],
+        "percentage_end": factors_percentage_end[1][4]
+    },
+    {
+        "question": "Self loss",
+        "type": "Agree",
+        "value": factors_of_awe_data[1][5],
+        "percentage": factors_percentage_of_respondents[1][5],
+        "percentage_start": factors_percentage_start[1][5],
+        "percentage_end": factors_percentage_end[1][5]
+    },
+    {
+        "question": "Self loss",
+        "type": "Strongly agree",
+        "value": factors_of_awe_data[1][6],
+        "percentage": factors_percentage_of_respondents[1][6],
+        "percentage_start": factors_percentage_start[1][6],
+        "percentage_end": factors_percentage_end[1][6]
+    },
+    {
+        "question": "Connection",
+        "type": "Strongly disagree",
+        "value": factors_of_awe_data[2][0],
+        "percentage": factors_percentage_of_respondents[2][0],
+        "percentage_start": factors_percentage_start[2][0],
+        "percentage_end": factors_percentage_end[2][0]
+    },
+    {
+        "question": "Connection",
+        "type": "Disagree",
+        "value": factors_of_awe_data[2][1],
+        "percentage": factors_percentage_of_respondents[2][1],
+        "percentage_start": factors_percentage_start[2][1],
+        "percentage_end": factors_percentage_end[2][1]
+    },
+    {
+        "question": "Connection",
+        "type": "Slightly disagree",
+        "value": factors_of_awe_data[2][2],
+        "percentage": factors_percentage_of_respondents[2][2],
+        "percentage_start": factors_percentage_start[2][2],
+        "percentage_end": factors_percentage_end[2][2]
+    },
+    {
+        "question": "Connection",
+        "type": "Neither agree nor disagree",
+        "value": factors_of_awe_data[2][3],
+        "percentage": factors_percentage_of_respondents[2][3],
+        "percentage_start": factors_percentage_start[2][3],
+        "percentage_end": factors_percentage_end[2][3]
+    },
+    {
+        "question": "Connection",
+        "type": "Slightly agree",
+        "value": factors_of_awe_data[2][4],
+        "percentage": factors_percentage_of_respondents[2][4],
+        "percentage_start": factors_percentage_start[2][4],
+        "percentage_end": factors_percentage_end[2][4]
+    },
+    {
+        "question": "Connection",
+        "type": "Agree",
+        "value": factors_of_awe_data[2][5],
+        "percentage": factors_percentage_of_respondents[2][5],
+        "percentage_start": factors_percentage_start[2][5],
+        "percentage_end": factors_percentage_end[2][5]
+    },
+    {
+        "question": "Connection",
+        "type": "Strongly agree",
+        "value": factors_of_awe_data[2][6],
+        "percentage": factors_percentage_of_respondents[2][6],
+        "percentage_start": factors_percentage_start[2][6],
+        "percentage_end": factors_percentage_end[2][6]
+    },
+    {
+        "question": "Vastness",
+        "type": "Strongly disagree",
+        "value": factors_of_awe_data[3][0],
+        "percentage": factors_percentage_of_respondents[3][0],
+        "percentage_start": factors_percentage_start[3][0],
+        "percentage_end": factors_percentage_end[3][0]
+    },
+    {
+        "question": "Vastness",
+        "type": "Disagree",
+        "value": factors_of_awe_data[3][1],
+        "percentage": factors_percentage_of_respondents[3][1],
+        "percentage_start": factors_percentage_start[3][1],
+        "percentage_end": factors_percentage_end[3][1]
+    },
+    {
+        "question": "Vastness",
+        "type": "Slightly disagree",
+        "value": factors_of_awe_data[3][2],
+        "percentage": factors_percentage_of_respondents[3][2],
+        "percentage_start": factors_percentage_start[3][2],
+        "percentage_end": factors_percentage_end[3][2]
+    },
+    {
+        "question": "Vastness",
+        "type": "Neither agree nor disagree",
+        "value": factors_of_awe_data[3][3],
+        "percentage": factors_percentage_of_respondents[3][3],
+        "percentage_start": factors_percentage_start[3][3],
+        "percentage_end": factors_percentage_end[3][3]
+    },
+    {
+        "question": "Vastness",
+        "type": "Slightly agree",
+        "value": factors_of_awe_data[3][4],
+        "percentage": factors_percentage_of_respondents[3][4],
+        "percentage_start": factors_percentage_start[3][4],
+        "percentage_end": factors_percentage_end[3][4]
+    },
+    {
+        "question": "Vastness",
+        "type": "Agree",
+        "value": factors_of_awe_data[3][5],
+        "percentage": factors_percentage_of_respondents[3][5],
+        "percentage_start": factors_percentage_start[3][5],
+        "percentage_end": factors_percentage_end[3][5]
+    },
+    {
+        "question": "Vastness",
+        "type": "Strongly agree",
+        "value": factors_of_awe_data[3][6],
+        "percentage": factors_percentage_of_respondents[3][6],
+        "percentage_start": factors_percentage_start[3][6],
+        "percentage_end": factors_percentage_end[3][6]
+    },
+    {
+        "question": "Physical",
+        "type": "Strongly disagree",
+        "value": factors_of_awe_data[4][0],
+        "percentage": factors_percentage_of_respondents[4][0],
+        "percentage_start": factors_percentage_start[4][0],
+        "percentage_end": factors_percentage_end[4][0]
+    },
+    {
+        "question": "Physical",
+        "type": "Disagree",
+        "value": factors_of_awe_data[4][1],
+        "percentage": factors_percentage_of_respondents[4][1],
+        "percentage_start": factors_percentage_start[4][1],
+        "percentage_end": factors_percentage_end[4][1]
+    },
+    {
+        "question": "Physical",
+        "type": "Slightly disagree",
+        "value": factors_of_awe_data[4][2],
+        "percentage": factors_percentage_of_respondents[4][2],
+        "percentage_start": factors_percentage_start[4][2],
+        "percentage_end": factors_percentage_end[4][2]
+    },
+    {
+        "question": "Physical",
+        "type": "Neither agree nor disagree",
+        "value": factors_of_awe_data[4][3],
+        "percentage": factors_percentage_of_respondents[4][3],
+        "percentage_start": factors_percentage_start[4][3],
+        "percentage_end": factors_percentage_end[4][3]
+    },
+    {
+        "question": "Physical",
+        "type": "Slightly agree",
+        "value": factors_of_awe_data[4][4],
+        "percentage": factors_percentage_of_respondents[4][4],
+        "percentage_start": factors_percentage_start[4][4],
+        "percentage_end": factors_percentage_end[4][4]
+    },
+    {
+        "question": "Physical",
+        "type": "Agree",
+        "value": factors_of_awe_data[4][5],
+        "percentage": factors_percentage_of_respondents[4][5],
+        "percentage_start": factors_percentage_start[4][5],
+        "percentage_end": factors_percentage_end[4][5]
+    },
+    {
+        "question": "Physical",
+        "type": "Strongly agree",
+        "value": factors_of_awe_data[4][6],
+        "percentage": factors_percentage_of_respondents[4][6],
+        "percentage_start": factors_percentage_start[4][6],
+        "percentage_end": factors_percentage_end[4][6]
+    },
+    {
+        "question": "Accommodation.",
+        "type": "Strongly disagree",
+        "value": factors_of_awe_data[5][0],
+        "percentage": factors_percentage_of_respondents[5][0],
+        "percentage_start": factors_percentage_start[5][0],
+        "percentage_end": factors_percentage_end[5][0]
+    },
+    {
+        "question": "Accommodation.",
+        "type": "Disagree",
+        "value": factors_of_awe_data[5][1],
+        "percentage": factors_percentage_of_respondents[5][1],
+        "percentage_start": factors_percentage_start[5][1],
+        "percentage_end": factors_percentage_end[5][1]
+    },
+    {
+        "question": "Accommodation.",
+        "type": "Slightly disagree",
+        "value": factors_of_awe_data[5][2],
+        "percentage": factors_percentage_of_respondents[5][2],
+        "percentage_start": factors_percentage_start[5][2],
+        "percentage_end": factors_percentage_end[5][2]
+    },
+    {
+        "question": "Accommodation.",
+        "type": "Neither agree nor disagree",
+        "value": factors_of_awe_data[5][3],
+        "percentage": factors_percentage_of_respondents[5][3],
+        "percentage_start": factors_percentage_start[5][3],
+        "percentage_end": factors_percentage_end[5][3]
+    },
+    {
+        "question": "Accommodation.",
+        "type": "Slightly agree",
+        "value": factors_of_awe_data[5][4],
+        "percentage": factors_percentage_of_respondents[5][4],
+        "percentage_start": factors_percentage_start[5][4],
+        "percentage_end": factors_percentage_end[5][4]
+    },
+    {
+        "question": "Accommodation.",
+        "type": "Agree",
+        "value": factors_of_awe_data[5][5],
+        "percentage": factors_percentage_of_respondents[5][5],
+        "percentage_start": factors_percentage_start[5][5],
+        "percentage_end": factors_percentage_end[5][5]
+    },
+    {
+        "question": "Accommodation.",
+        "type": "Strongly agree",
+        "value": factors_of_awe_data[5][6],
+        "percentage": factors_percentage_of_respondents[5][6],
+        "percentage_start": factors_percentage_start[5][6],
+        "percentage_end": factors_percentage_end[5][6]
+    }
 
-      # {
-      #   "question": "Question 2",
-      #   "type": "Strongly disagree",
-      #   "value": 2,
-      #   "percentage": 18.2,
-      #   "percentage_start": -36.4,
-      #   "percentage_end": -18.2
-      # },
-      # {
-      #   "question": "Question 2",
-      #   "type": "Disagree",
-      #   "value": 2,
-      #   "percentage": 18.2,
-      #   "percentage_start": -18.2,
-      #   "percentage_end": 0
-      # },
-      # {
-      #   "question": "Question 2",
-      #   "type": "Neither agree nor disagree",
-      #   "value": 0,
-      #   "percentage": 0,
-      #   "percentage_start": 0,
-      #   "percentage_end": 0
-      # },
-      # {
-      #   "question": "Question 2",
-      #   "type": "Agree",
-      #   "value": 7,
-      #   "percentage": 63.6,
-      #   "percentage_start": 0,
-      #   "percentage_end": 63.6
-      # },
-      # {
-      #   "question": "Question 2",
-      #   "type": "Strongly agree",
-      #   "value": 11,
-      #   "percentage": 0,
-      #   "percentage_start": 63.6,
-      #   "percentage_end": 63.6
-      # },
-
-      # {
-      #   "question": "Question 3",
-      #   "type": "Strongly disagree",
-      #   "value": 2,
-      #   "percentage": 20,
-      #   "percentage_start": -30,
-      #   "percentage_end": -10
-      # },
-      # {
-      #   "question": "Question 3",
-      #   "type": "Disagree",
-      #   "value": 0,
-      #   "percentage": 0,
-      #   "percentage_start": -10,
-      #   "percentage_end": -10
-      # },
-      # {
-      #   "question": "Question 3",
-      #   "type": "Neither agree nor disagree",
-      #   "value": 2,
-      #   "percentage": 20,
-      #   "percentage_start": -10,
-      #   "percentage_end": 10
-      # },
-      # {
-      #   "question": "Question 3",
-      #   "type": "Agree",
-      #   "value": 4,
-      #   "percentage": 40,
-      #   "percentage_start": 10,
-      #   "percentage_end": 50
-      # },
-      # {
-      #   "question": "Question 3",
-      #   "type": "Strongly agree",
-      #   "value": 2,
-      #   "percentage": 20,
-      #   "percentage_start": 50,
-      #   "percentage_end": 70
-      # },
-
-      # {
-      #   "question": "Question 4",
-      #   "type": "Strongly disagree",
-      #   "value": 0,
-      #   "percentage": 0,
-      #   "percentage_start": -15.6,
-      #   "percentage_end": -15.6
-      # },
-      # {
-      #   "question": "Question 4",
-      #   "type": "Disagree",
-      #   "value": 2,
-      #   "percentage": 12.5,
-      #   "percentage_start": -15.6,
-      #   "percentage_end": -3.1
-      # },
-      # {
-      #   "question": "Question 4",
-      #   "type": "Neither agree nor disagree",
-      #   "value": 1,
-      #   "percentage": 6.3,
-      #   "percentage_start": -3.1,
-      #   "percentage_end": 3.1
-      # },
-      # {
-      #   "question": "Question 4",
-      #   "type": "Agree",
-      #   "value": 7,
-      #   "percentage": 43.8,
-      #   "percentage_start": 3.1,
-      #   "percentage_end": 46.9
-      # },
-      # {
-      #   "question": "Question 4",
-      #   "type": "Strongly agree",
-      #   "value": 6,
-      #   "percentage": 37.5,
-      #   "percentage_start": 46.9,
-      #   "percentage_end": 84.4
-      # },
-
-      # {
-      #   "question": "Question 5",
-      #   "type": "Strongly disagree",
-      #   "value": 0,
-      #   "percentage": 0,
-      #   "percentage_start": -10.4,
-      #   "percentage_end": -10.4
-      # },
-      # {
-      #   "question": "Question 5",
-      #   "type": "Disagree",
-      #   "value": 1,
-      #   "percentage": 4.2,
-      #   "percentage_start": -10.4,
-      #   "percentage_end": -6.3
-      # },
-      # {
-      #   "question": "Question 5",
-      #   "type": "Neither agree nor disagree",
-      #   "value": 3,
-      #   "percentage": 12.5,
-      #   "percentage_start": -6.3,
-      #   "percentage_end": 6.3
-      # },
-      # {
-      #   "question": "Question 5",
-      #   "type": "Agree",
-      #   "value": 16,
-      #   "percentage": 66.7,
-      #   "percentage_start": 6.3,
-      #   "percentage_end": 72.9
-      # },
-      # {
-      #   "question": "Question 5",
-      #   "type": "Strongly agree",
-      #   "value": 4,
-      #   "percentage": 16.7,
-      #   "percentage_start": 72.9,
-      #   "percentage_end": 89.6
-      # },
-
-      # {
-      #   "question": "Question 6",
-      #   "type": "Strongly disagree",
-      #   "value": 1,
-      #   "percentage": 6.3,
-      #   "percentage_start": -18.8,
-      #   "percentage_end": -12.5
-      # },
-      # {
-      #   "question": "Question 6",
-      #   "type": "Disagree",
-      #   "value": 1,
-      #   "percentage": 6.3,
-      #   "percentage_start": -12.5,
-      #   "percentage_end": -6.3
-      # },
-      # {
-      #   "question": "Question 6",
-      #   "type": "Neither agree nor disagree",
-      #   "value": 2,
-      #   "percentage": 12.5,
-      #   "percentage_start": -6.3,
-      #   "percentage_end": 6.3
-      # },
-      # {
-      #   "question": "Question 6",
-      #   "type": "Agree",
-      #   "value": 9,
-      #   "percentage": 56.3,
-      #   "percentage_start": 6.3,
-      #   "percentage_end": 62.5
-      # },
-      # {
-      #   "question": "Question 6",
-      #   "type": "Strongly agree",
-      #   "value": 3,
-      #   "percentage": 18.8,
-      #   "percentage_start": 62.5,
-      #   "percentage_end": 81.3
-      # },
-
-      # {
-      #   "question": "Question 7",
-      #   "type": "Strongly disagree",
-      #   "value": 0,
-      #   "percentage": 0,
-      #   "percentage_start": -10,
-      #   "percentage_end": -10
-      # },
-      # {
-      #   "question": "Question 7",
-      #   "type": "Disagree",
-      #   "value": 0,
-      #   "percentage": 0,
-      #   "percentage_start": -10,
-      #   "percentage_end": -10
-      # },
-      # {
-      #   "question": "Question 7",
-      #   "type": "Neither agree nor disagree",
-      #   "value": 1,
-      #   "percentage": 20,
-      #   "percentage_start": -10,
-      #   "percentage_end": 10
-      # },
-      # {
-      #   "question": "Question 7",
-      #   "type": "Agree",
-      #   "value": 4,
-      #   "percentage": 80,
-      #   "percentage_start": 10,
-      #   "percentage_end": 90
-      # },
-      # {
-      #   "question": "Question 7",
-      #   "type": "Strongly agree",
-      #   "value": 0,
-      #   "percentage": 0,
-      #   "percentage_start": 90,
-      #   "percentage_end": 90
-      # },
-
-      # {
-      #   "question": "Question 8",
-      #   "type": "Strongly disagree",
-      #   "value": 0,
-      #   "percentage": 0,
-      #   "percentage_start": 0,
-      #   "percentage_end": 0
-      # },
-      # {
-      #   "question": "Question 8",
-      #   "type": "Disagree",
-      #   "value": 0,
-      #   "percentage": 0,
-      #   "percentage_start": 0,
-      #   "percentage_end": 0
-      # },
-      # {
-      #   "question": "Question 8",
-      #   "type": "Neither agree nor disagree",
-      #   "value": 0,
-      #   "percentage": 0,
-      #   "percentage_start": 0,
-      #   "percentage_end": 0
-      # },
-      # {
-      #   "question": "Question 8",
-      #   "type": "Agree",
-      #   "value": 0,
-      #   "percentage": 0,
-      #   "percentage_start": 0,
-      #   "percentage_end": 0
-      # },
-      # {
-      #   "question": "Question 8",
-      #   "type": "Strongly agree",
-      #   "value": 2,
-      #   "percentage": 100,
-      #   "percentage_start": 0,
-      #   "percentage_end": 100
-      # }
 ])
+
+plasma_colors = calculate_plasma_colors_for_bar(number_of_likert_scale_points)
 
 color_scale = alt.Scale(
     domain=[
@@ -393,11 +475,11 @@ color_scale = alt.Scale(
         "Agree",
         "Strongly agree"
     ],
-    range=["#c30d24", "#f3a583", "#f3c3a3", "#cccccc", "#c3c6f3", "#94c6da", "#1770ab"]
+    range=plasma_colors
 )
 
 y_axis = alt.Axis(
-    title='Question',
+    title='Factors of Awe',
     offset=5,
     ticks=False,
     minExtent=60,
