@@ -1,10 +1,10 @@
 import altair as alt
-from altair_saver import save
+# from altair_saver import save
 import numpy as np
 from plasma_colors_for_bar import calculate_plasma_colors_for_bar
 
-alt.renderers.set_embed_options(theme='dark')
-alt.renderers.enable('png')
+# alt.renderers.set_embed_options(theme='dark')
+# alt.renderers.enable('png')
 
 number_of_likert_scale_points = 7
 
@@ -32,10 +32,9 @@ percentage_end = np.append(percentage_end,
                            + percentage_of_respondents[6])
 
 # AWE-S ("After class") Data
-# Rows = Time, Self loss, Connection, Vastness, Physical, Accomodation
+# Rows = Time, Self loss, Connection, Vastness, Physical, Accommodation
 # Columns = # of {Strongly disagree, disagree, slightly disagree, neither agree nor disagree,
 #                 slightly agree, agree, strongly agree} respondents
-number_of_factors = 6
 factors_of_awe_data = np.array([[0, 0, 6, 3, 4, 1, 0],
                                 [0, 2, 3, 7, 2, 0, 0],
                                 [0, 0, 5, 4, 4, 1, 0],
@@ -43,22 +42,25 @@ factors_of_awe_data = np.array([[0, 0, 6, 3, 4, 1, 0],
                                 [0, 4, 1, 6, 2, 1, 0],
                                 [0, 0, 1, 4, 4, 5, 0]])
 
+number_of_factors = len(factors_of_awe_data[:, 0])
 factors_percentage_of_respondents = 100 * factors_of_awe_data / number_of_respondents
-factors_p3half = 0.5 * factors_percentage_of_respondents[:, 3]
+middle_index = int(number_of_likert_scale_points/2)
+factors_p3half = 0.5 * factors_percentage_of_respondents[:, middle_index]
 
-factors_percentage_start = np.array([-factors_p3half - factors_percentage_of_respondents[:, 2]
-                                                     - factors_percentage_of_respondents[:, 1]
-                                                     - factors_percentage_of_respondents[:, 0],
-                                     -factors_p3half - factors_percentage_of_respondents[:, 2]
-                                                     - factors_percentage_of_respondents[:, 1],
-                                     -factors_p3half - factors_percentage_of_respondents[:, 2],
-                                     -factors_p3half,
-                                      factors_p3half,
-                                      factors_p3half + factors_percentage_of_respondents[:, 4],
-                                      factors_p3half + factors_percentage_of_respondents[:, 4]
-                                                     + factors_percentage_of_respondents[:, 5]])
+factors_percentage_start = np.zeros([number_of_factors, number_of_likert_scale_points])
 
-factors_percentage_end = factors_percentage_start[1:]
+factors_percentage_start[:, middle_index] = -factors_p3half
+for index in range(middle_index-1, -1, -1):
+    factors_percentage_start[:, index] = factors_percentage_start[:, index+1] - \
+                                         factors_percentage_of_respondents[:, index]
+
+factors_percentage_start[:, middle_index+1] = factors_p3half
+for index in range(middle_index+2, number_of_likert_scale_points):
+    factors_percentage_start[:, index] = factors_percentage_start[:, index-1] + \
+                                         factors_percentage_of_respondents[:, index]
+
+
+factors_percentage_end = factors_percentage_start[:, 1:]
 last_column = np.reshape(factors_p3half +
                          factors_percentage_of_respondents[:, 4] +
                          factors_percentage_of_respondents[:, 5] +
@@ -68,62 +70,62 @@ factors_percentage_end = np.append(factors_percentage_end, last_column, axis=1)
 
 
 source = alt.pd.DataFrame([
-    {
-        "question": "Pre-Class Awe",
-        "type": "Strongly disagree",
-        "value": nature_data[0],
-        "percentage": percentage_of_respondents[0],
-        "percentage_start": percentage_start[0],
-        "percentage_end": percentage_end[0]
-    },
-    {
-        "question": "Pre-Class Awe",
-        "type": "Disagree",
-        "value": nature_data[1],
-        "percentage": percentage_of_respondents[1],
-        "percentage_start": percentage_start[1],
-        "percentage_end": percentage_end[1]
-    },
-    {
-        "question": "Pre-Class Awe",
-        "type": "Slightly disagree",
-        "value": nature_data[2],
-        "percentage": percentage_of_respondents[2],
-        "percentage_start": percentage_start[2],
-        "percentage_end": percentage_end[2]
-    },
-    {
-        "question": "Pre-Class Awe",
-        "type": "Neither agree nor disagree",
-        "value": nature_data[3],
-        "percentage": percentage_of_respondents[3],
-        "percentage_start": percentage_start[3],
-        "percentage_end": percentage_end[3]
-    },
-    {
-        "question": "Pre-Class Awe",
-        "type": "Slightly agree",
-        "value": nature_data[4],
-        "percentage": percentage_of_respondents[4],
-        "percentage_start": percentage_start[4],
-        "percentage_end": percentage_end[4]
-    },
-    {
-        "question": "Pre-Class Awe",
-        "type": "Agree",
-        "value": nature_data[5],
-        "percentage": percentage_of_respondents[5],
-        "percentage_start": percentage_start[5],
-        "percentage_end": percentage_end[5]
-    },
-    {
-        "question": "Pre-Class Awe",
-        "type": "Strongly agree",
-        "value": nature_data[6],
-        "percentage": percentage_of_respondents[6],
-        "percentage_start": percentage_start[6],
-        "percentage_end": percentage_end[6]
-    },
+    # {
+    #     "question": "Pre-Class Awe",
+    #     "type": "Strongly disagree",
+    #     "value": nature_data[0],
+    #     "percentage": percentage_of_respondents[0],
+    #     "percentage_start": percentage_start[0],
+    #     "percentage_end": percentage_end[0]
+    # },
+    # {
+    #     "question": "Pre-Class Awe",
+    #     "type": "Disagree",
+    #     "value": nature_data[1],
+    #     "percentage": percentage_of_respondents[1],
+    #     "percentage_start": percentage_start[1],
+    #     "percentage_end": percentage_end[1]
+    # },
+    # {
+    #     "question": "Pre-Class Awe",
+    #     "type": "Slightly disagree",
+    #     "value": nature_data[2],
+    #     "percentage": percentage_of_respondents[2],
+    #     "percentage_start": percentage_start[2],
+    #     "percentage_end": percentage_end[2]
+    # },
+    # {
+    #     "question": "Pre-Class Awe",
+    #     "type": "Neither agree nor disagree",
+    #     "value": nature_data[3],
+    #     "percentage": percentage_of_respondents[3],
+    #     "percentage_start": percentage_start[3],
+    #     "percentage_end": percentage_end[3]
+    # },
+    # {
+    #     "question": "Pre-Class Awe",
+    #     "type": "Slightly agree",
+    #     "value": nature_data[4],
+    #     "percentage": percentage_of_respondents[4],
+    #     "percentage_start": percentage_start[4],
+    #     "percentage_end": percentage_end[4]
+    # },
+    # {
+    #     "question": "Pre-Class Awe",
+    #     "type": "Agree",
+    #     "value": nature_data[5],
+    #     "percentage": percentage_of_respondents[5],
+    #     "percentage_start": percentage_start[5],
+    #     "percentage_end": percentage_end[5]
+    # },
+    # {
+    #     "question": "Pre-Class Awe",
+    #     "type": "Strongly agree",
+    #     "value": nature_data[6],
+    #     "percentage": percentage_of_respondents[6],
+    #     "percentage_start": percentage_start[6],
+    #     "percentage_end": percentage_end[6]
+    # },
     {
         "question": "Time",
         "type": "Strongly disagree",
@@ -183,7 +185,7 @@ source = alt.pd.DataFrame([
     {
         "question": "Self loss",
         "type": "Strongly disagree",
-        "value": factors_of_awe_data[0],
+        "value": factors_of_awe_data[1][0],
         "percentage": factors_percentage_of_respondents[1][0],
         "percentage_start": factors_percentage_start[1][0],
         "percentage_end": factors_percentage_end[1][0]
@@ -460,7 +462,6 @@ source = alt.pd.DataFrame([
         "percentage_start": factors_percentage_start[5][6],
         "percentage_end": factors_percentage_end[5][6]
     }
-
 ])
 
 plasma_colors = calculate_plasma_colors_for_bar(number_of_likert_scale_points)
@@ -486,8 +487,13 @@ y_axis = alt.Axis(
     domain=False
 )
 
+x_axis = alt.Axis(
+    title='Disagree/Agree (%)',
+    offset=5
+)
+
 chart = alt.Chart(source).mark_bar().encode(
-    x='percentage_start:Q',
+    x=alt.X('percentage_start:Q', axis=x_axis),
     x2='percentage_end:Q',
     y=alt.Y('question:N', axis=y_axis),
     color=alt.Color(
