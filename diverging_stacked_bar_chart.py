@@ -4,6 +4,25 @@ import numpy as np
 from plasma_colors_for_bar import calculate_plasma_colors_for_bar
 
 # alt.renderers.set_embed_options(theme='dark')
+
+
+def dark_theme():
+    return {'config': {'background': 'black',
+                       'axis': {'titleColor': 'white',
+                                'domainColor': 'white',
+                                'gridColor': 'white',
+                                'labelColor': 'white',
+                                'tickColor': 'white'},
+                       'legend': {'labelColor': 'white',
+                                  'tickColor': 'white'}
+                       }
+            }
+
+
+alt.themes.register('dark_theme', dark_theme)
+alt.themes.enable('dark_theme')
+
+
 # alt.renderers.enable('png')
 
 number_of_likert_scale_points = 7
@@ -407,7 +426,7 @@ source = alt.pd.DataFrame([
         "percentage_end": factors_percentage_end[4][6]
     },
     {
-        "question": "Accommodation.",
+        "question": "Accommodation",
         "type": "Strongly disagree",
         "value": factors_of_awe_data[5][0],
         "percentage": factors_percentage_of_respondents[5][0],
@@ -415,7 +434,7 @@ source = alt.pd.DataFrame([
         "percentage_end": factors_percentage_end[5][0]
     },
     {
-        "question": "Accommodation.",
+        "question": "Accommodation",
         "type": "Disagree",
         "value": factors_of_awe_data[5][1],
         "percentage": factors_percentage_of_respondents[5][1],
@@ -423,7 +442,7 @@ source = alt.pd.DataFrame([
         "percentage_end": factors_percentage_end[5][1]
     },
     {
-        "question": "Accommodation.",
+        "question": "Accommodation",
         "type": "Slightly disagree",
         "value": factors_of_awe_data[5][2],
         "percentage": factors_percentage_of_respondents[5][2],
@@ -431,7 +450,7 @@ source = alt.pd.DataFrame([
         "percentage_end": factors_percentage_end[5][2]
     },
     {
-        "question": "Accommodation.",
+        "question": "Accommodation",
         "type": "Neither agree nor disagree",
         "value": factors_of_awe_data[5][3],
         "percentage": factors_percentage_of_respondents[5][3],
@@ -439,7 +458,7 @@ source = alt.pd.DataFrame([
         "percentage_end": factors_percentage_end[5][3]
     },
     {
-        "question": "Accommodation.",
+        "question": "Accommodation",
         "type": "Slightly agree",
         "value": factors_of_awe_data[5][4],
         "percentage": factors_percentage_of_respondents[5][4],
@@ -447,7 +466,7 @@ source = alt.pd.DataFrame([
         "percentage_end": factors_percentage_end[5][4]
     },
     {
-        "question": "Accommodation.",
+        "question": "Accommodation",
         "type": "Agree",
         "value": factors_of_awe_data[5][5],
         "percentage": factors_percentage_of_respondents[5][5],
@@ -455,7 +474,7 @@ source = alt.pd.DataFrame([
         "percentage_end": factors_percentage_end[5][5]
     },
     {
-        "question": "Accommodation.",
+        "question": "Accommodation",
         "type": "Strongly agree",
         "value": factors_of_awe_data[5][6],
         "percentage": factors_percentage_of_respondents[5][6],
@@ -492,7 +511,7 @@ x_axis = alt.Axis(
     offset=5
 )
 
-chart = alt.Chart(source).mark_bar().encode(
+chart = alt.Chart(source, height=256, width=512).mark_bar().encode(
     x=alt.X('percentage_start:Q', axis=x_axis),
     x2='percentage_end:Q',
     y=alt.Y('question:N', axis=y_axis),
@@ -501,7 +520,9 @@ chart = alt.Chart(source).mark_bar().encode(
         legend=alt.Legend(title='Response'),
         scale=color_scale,
     )
-)
+).configure_axis(labelFontSize=18, titleFontSize=18)
+
+chart.configure_legend(labelFontSize=18, titleFontSize=18)
 
 chart.show()
 
